@@ -63,11 +63,69 @@ const ReadData = () => {
       });
   };
 
+  const docCacheRead = () => {
+    const docRef = db.collection("cities").doc("SF");
+
+    // Valid options for source are 'server', 'cache', or
+    const getOptions = {
+      source: "cache"
+    };
+
+    docRef
+      .get(getOptions)
+      .then((doc) => {
+        console.log("Cached document data: ", doc.data());
+      })
+      .catch((err) => {
+        console.log("Error getting cached document: ", err);
+      });
+  };
+
+  const someDocRead = () => {
+    db.collection("cities")
+      .where("capital", "==", true)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id, "---", doc.data());
+        });
+      })
+      .catch((err) => {
+        console.log("Error getting documents: ", err);
+      });
+  };
+
+  const sfListener = () => {
+    db.collection("cities")
+      .doc("SF")
+      .onSnapshot((doc) => {
+        console.log("Current data: ", doc.data());
+      });
+  };
+
+  const someCAListener = () => {
+    db.collection("cities")
+      .where("state", "==", "CA")
+      .onSnapshot((querySnapshot) => {
+        let cities = [];
+        querySnapshot.forEach((doc) => {
+          cities.push(doc.data().name);
+        });
+        console.log("Current cities in CA: ", cities.join(","));
+      });
+  };
+
   return (
     <>
       <div>
         <button onClick={() => citiesDataSet()}>都市データセット</button>
         <button onClick={() => docRead()}>SFデータ取得</button>
+        <button onClick={() => docCacheRead()}>SFキャッシュデータ取得</button>
+        <button onClick={() => someDocRead()}>複数データ取得</button>
+        <button onClick={() => sfListener()}>
+          サンフランシスコ変更リスナー
+        </button>
+        <button onClick={() => someCAListener()}>CA city</button>
       </div>
     </>
   );
