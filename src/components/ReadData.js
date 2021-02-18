@@ -115,6 +115,74 @@ const ReadData = () => {
       });
   };
 
+  const arrayContains = () => {
+    db.collection("cities")
+      .where("regions", "array-contains", "west_coast")
+      .onSnapshot((snapshot) => {
+        snapshot.forEach((city) => {
+          console.log(city.data());
+        });
+      });
+  };
+
+  //コレクショングループクエリ
+  const citiesRef = db.collection("cities");
+  const setLandmarks = () => {
+    Promise.all([
+      citiesRef.doc("SF").collection("landmarks").doc().set({
+        name: "Golden Gate Bridge",
+        type: "bridge"
+      }),
+      citiesRef.doc("SF").collection("landmarks").doc().set({
+        name: "Legion of Honor",
+        type: "museum"
+      }),
+      citiesRef.doc("LA").collection("landmarks").doc().set({
+        name: "Griffith Park",
+        type: "park"
+      }),
+      citiesRef.doc("LA").collection("landmarks").doc().set({
+        name: "The Getty",
+        type: "museum"
+      }),
+      citiesRef.doc("DC").collection("landmarks").doc().set({
+        name: "Lincoln Memorial",
+        type: "memorial"
+      }),
+      citiesRef.doc("DC").collection("landmarks").doc().set({
+        name: "National Air and Space Museum",
+        type: "museum"
+      }),
+      citiesRef.doc("TOK").collection("landmarks").doc().set({
+        name: "ueno Park",
+        type: "park"
+      }),
+      citiesRef.doc("TOK").collection("landmarks").doc().set({
+        name: "National Museum of Nature and Science",
+        type: "museum"
+      }),
+      citiesRef.doc("BJ").collection("landmarks").doc().set({
+        name: "Jingshan Park",
+        type: "park"
+      }),
+      citiesRef.doc("BJ").collection("landmarks").doc().set({
+        name: "Beijing Ancient Observatory",
+        type: "museum"
+      })
+    ]);
+  };
+
+  const getAllMuseums = () => {
+    const museums = db
+      .collectionGroup("landmarks")
+      .where("type", "==", "museum");
+    museums.get().then((querySnapshot) =>
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id, ": ", doc.data());
+      })
+    );
+  };
+
   return (
     <>
       <div>
@@ -126,6 +194,9 @@ const ReadData = () => {
           サンフランシスコ変更リスナー
         </button>
         <button onClick={() => someCAListener()}>CA city</button>
+        <button onClick={() => arrayContains()}>arrays contains</button>
+        <button onClick={() => setLandmarks()}>set landmarks</button>
+        <button onClick={() => getAllMuseums()}>get All Museums</button>
       </div>
     </>
   );
